@@ -1,0 +1,27 @@
+{
+  "name": "shortcodes/files-upload",
+  "description": "Allows to easly upload files and store in tmp dir",
+  "license": "mit",
+  "authors": [
+    {
+      "name": "Roman Szymanski",
+      "email": "roman.szymanski@shortcodes.pl"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Shortcodes\\FilesUpload\\FilesUploadPackageProvider"
+      ]
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Shortcodes\\FilesUpload\\": "src/"
+    }
+  }
+}
