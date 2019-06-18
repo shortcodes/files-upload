@@ -13,6 +13,7 @@ class FilesUploadPackageProvider extends ServiceProvider
         Route::macro('uploadRoutes', function () {
             Route::group(['prefix' => 'files'], function () {
                 Route::post('/', [UploadController::class, 'store']);
+                Route::get('/{url}', [UploadController::class, 'show'])->where('url', '.*');
             });
         });
 

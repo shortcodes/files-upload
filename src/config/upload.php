@@ -7,5 +7,6 @@ return [
         'image/gif',
     ],
     'max_file_size' => 8 * 1024, //8Mb,
-    'path' => 'tmp'
+    'tmp_path' => 'tmp',
+    'files_path' => 'files'
 ];
