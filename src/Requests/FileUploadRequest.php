@@ -13,14 +13,19 @@ class FileUploadRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'file' => [
                 'required',
-                'mimetypes:' . $this->getAllowedMimetypes(),
                 'file',
                 'max:' . config('upload.max_file_size'),
             ],
         ];
+
+        if ($this->getAllowedMimetypes()) {
+            $rules['file'][] = 'mimetypes:' . $this->getAllowedMimetypes();
+        }
+
+        return $rules;
     }
 
     private function getAllowedMimetypes()
