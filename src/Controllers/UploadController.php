@@ -2,6 +2,7 @@
 
 namespace Shortcodes\FilesUpload\Controllers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Shortcodes\FilesUpload\Requests\FileUploadRequest;
@@ -19,7 +20,10 @@ class UploadController
 
         $path = $file->store(config('upload.tmp_path', 'tmp'));
 
-        return response()->json(['path' => $path], 201);
+        return response()->json([
+            'url' => App::make('url')->to('/v1') . '/files',
+            'path' => $path
+        ], 201);
     }
 
     public function show($url)
