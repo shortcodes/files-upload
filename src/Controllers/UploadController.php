@@ -21,8 +21,7 @@ class UploadController
         $path = $file->store(config('upload.tmp_path', 'tmp'));
 
         return response()->json([
-            'url' => App::make('url')->to('/v1') . '/files',
-            'path' => $path
+            'path' => App::make('url')->to('/v1') . '/files/'.$path
         ], 201);
     }
 
