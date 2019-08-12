@@ -26,6 +26,9 @@ class UploadController
 
         if (!$request->file('file') && $request->get('url')) {
             $path = $this->getOuterUrl($request->get('url'));
+            return response()->json([
+                'data' => App::make('url')->to('/v1') . '/files/' . $path
+            ], 201);
         }
 
         return response()->json([
@@ -41,7 +44,7 @@ class UploadController
             return response()->json(['message' => 'The file is incorrect'], 422);
         }
         $fileName = Str::random(40) . '.jpg';
-        $filePath = 'files/tmp/' . $fileName;
+        $filePath = 'tmp/' . $fileName;
         $image = Image::make($file);
         Storage::put($filePath, (string)$image->stream('image/jpg'));
 
