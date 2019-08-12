@@ -4,6 +4,7 @@ namespace Shortcodes\FilesUpload\Controllers;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use Shortcodes\FilesUpload\Requests\FileUploadRequest;
 
@@ -13,16 +14,50 @@ class UploadController
     public function store(FileUploadRequest $request)
     {
         $file = $request->file('file');
+        $path = null;
 
-        if (!$file->isValid()) {
+        if (!$request->get('url') && !$file->isValid()) {
             return $this->response()->json(['message' => 'Uploaded file is invalid'], 422);
         }
 
-        $path = $file->store(config('upload.tmp_path', 'tmp'));
+        if ($request->file('file')) {
+            $path = $file->store(config('upload.tmp_path', 'tmp'));
+        }
+
+        if (!$request->file('file') && $request->get('url')) {
+            $path = $this->getOuterUrl($request->get('url'));
+        }
 
         return response()->json([
-            'path' => App::make('url')->to('/v1') . '/files/'.$path
+            'path' => App::make('url')->to('/v1') . '/files/' . $path
         ], 201);
+    }
+
+    public function getOuterUrl($url)
+    {
+        try {
+            $file = file_get_contents($url);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'The file is incorrect'], 422);
+        }
+        $fileName = Str::random(40) . '.jpg';
+        $filePath = 'files/tmp/' . $fileName;
+        $image = Image::make($file);
+        Storage::put($filePath, (string)$image->stream('image/jpg'));
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, storage_path('app/' . $filePath));
+        finfo_close($finfo);
+
+        $allowedMimes = config('upload.allowed_mimetypes');
+
+        if ($allowedMimes && !in_array($mimeType, $allowedMimes)) {
+            Storage::delete($filePath);
+            return response()->json(['message' => 'Mime type is incorrect'], 422);
+        }
+
+        return $filePath;
+
     }
 
     public function show($url)
@@ -67,7 +102,7 @@ class UploadController
             $constraint->aspectRatio();
         });
 
-        Storage::put($thumbPath, (string) $image->stream());
+        Storage::put($thumbPath, (string)$image->stream());
 
         $response = response($image->stream(), 200);
         $response->header('Content-Type', $mimeType);
