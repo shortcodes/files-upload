@@ -32,7 +32,8 @@ class UploadController
         }
 
         return response()->json([
-            'path' => App::make('url')->to('/v1') . '/files/' . $path
+            'path' => App::make('url')->to('/v1') . '/files/' . $path,
+            'title' => $file->getClientOriginalName()
         ], 201);
     }
 
